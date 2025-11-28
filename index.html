@@ -190,6 +190,36 @@
       flex-wrap: wrap;
     }
 
+    .voice-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0 4px;
+      flex-wrap: wrap;
+    }
+
+    .voice-row label {
+      font-weight: 700;
+      color: #2b243f;
+    }
+
+    select {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 2px solid #ffd68a;
+      background: #fffdf7;
+      font-size: 15px;
+      font-weight: 700;
+      color: #2b243f;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #ff7ac3;
+      box-shadow: 0 0 0 4px rgba(255, 122, 195, 0.22);
+    }
+
     input[type="text"] {
       flex: 1;
       min-width: 180px;
@@ -504,6 +534,10 @@
             aria-label="Player name">
           <button type="submit">Start the buzz!</button>
         </form>
+        <div class="voice-row hidden" id="voice-select-row">
+          <label for="voice-select">Voice:</label>
+          <select id="voice-select" aria-label="Choose the speech voice"></select>
+        </div>
         <div class="summary">
           <div class="tag">✨ Adventure tips</div>
           <div class="muted">🐝 Tap the speaker if you need to hear the word again.</div>
@@ -597,6 +631,8 @@
     const timerLabel = document.getElementById("timer-label");
     let feedbackClearTimeout = null;
     let confettiContainer = null;
+    let availableVoices = [];
+    const voiceStorageKey = "spelling-quest-voice";
 
     const scoreEl = document.getElementById("score");
     const wordCountEl = document.getElementById("word-count");
@@ -615,6 +651,8 @@
     const speakBtn = document.getElementById("speak-btn");
     const playAgainBtn = document.getElementById("play-again");
     const reviewBtn = document.getElementById("review-btn");
+    const voiceSelectRow = document.getElementById("voice-select-row");
+    const voiceSelect = document.getElementById("voice-select");
 
     let gameState = {
       name: "",
@@ -655,6 +693,30 @@
       feedbackClearTimeout = setTimeout(() => {
         clearFeedbackLine();
       }, 5000);
+    }
+
+    function refreshVoices() {
+      if (!window.speechSynthesis || !window.speechSynthesis.getVoices) return;
+      const list = window.speechSynthesis.getVoices() || [];
+      const filtered = list.filter((v) => (v.lang || "").toLowerCase().includes("en-us"));
+      availableVoices = filtered;
+      if (!filtered.length || filtered.length < 2) {
+        voiceSelectRow.classList.add("hidden");
+        voiceSelect.innerHTML = "";
+        return;
+      }
+      voiceSelectRow.classList.remove("hidden");
+      voiceSelect.innerHTML = "";
+      filtered.forEach((v) => {
+        const opt = document.createElement("option");
+        opt.value = v.name;
+        opt.textContent = `${v.name}${v.lang ? ` (${v.lang})` : ""}${v.default ? " •" : ""}`;
+        voiceSelect.appendChild(opt);
+      });
+      const saved = localStorage.getItem(voiceStorageKey);
+      const fallback = filtered.find((v) => v.default) || filtered[0];
+      const target = filtered.find((v) => v.name === saved) || fallback;
+      if (target) voiceSelect.value = target.name;
     }
 
     function ensureConfettiContainer() {
@@ -728,6 +790,10 @@
       u.lang = "en-US";
       u.rate = 0.7;  // original: 0.95
       u.pitch = 1.02; // original: 1.02
+      if (voiceSelect && availableVoices.length) {
+        const chosen = availableVoices.find((v) => v.name === voiceSelect.value);
+        if (chosen) u.voice = chosen;
+      }
       window.speechSynthesis.speak(u);
     }
 
@@ -911,6 +977,10 @@
       clearFeedbackLine();
     });
 
+    voiceSelect.addEventListener("change", () => {
+      localStorage.setItem(voiceStorageKey, voiceSelect.value);
+    });
+
     playAgainBtn.addEventListener("click", () => {
       summaryCard.classList.add("hidden");
       setupCard.classList.remove("hidden");
@@ -932,6 +1002,11 @@
       }
     });
 
+    if (window.speechSynthesis && "onvoiceschanged" in window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = () => refreshVoices();
+    }
+
+    refreshVoices();
     renderScores();
   </script>
 </body>
