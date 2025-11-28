@@ -726,8 +726,8 @@
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(word);
       u.lang = "en-US";
-      u.rate = 0.3;
-      u.pitch = 4;
+      u.rate = 0.7;  // original: 0.95
+      u.pitch = 1.02; // original: 1.02
       window.speechSynthesis.speak(u);
     }
 
