@@ -1,35 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spelling Quest</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Fredoka:wght@500;600&display=swap');
+
     :root {
-      --bg: #f7f3ff;
-      --card: #ffffff;
-      --accent: #5c6cff;
-      --accent-2: #ff9f6e;
-      --text: #1f1f33;
-      --muted: #6a6a80;
-      --success: #1bbf72;
-      --danger: #ff4f5e;
+      --bg-1: #fff4d8;
+      --bg-2: #ffe1ec;
+      --bg-3: #d8f3ff;
+      --card: #fffdf7;
+      --accent: #ff7ac3;
+      --accent-2: #ffb347;
+      --accent-3: #5cc6ff;
+      --accent-4: #66e3b0;
+      --text: #2b243f;
+      --muted: #5d5771;
+      --success: #28c57b;
+      --danger: #ff5252;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Avenir Next", "Trebuchet MS", "Gill Sans", sans-serif;
-      background: radial-gradient(circle at 15% 20%, rgba(255, 199, 135, 0.3), transparent 25%),
-                  radial-gradient(circle at 80% 0%, rgba(92, 108, 255, 0.25), transparent 35%),
-                  linear-gradient(135deg, #fdfbff 0%, #f2f5ff 100%);
+      font-family: "Baloo 2", "Fredoka", "Comic Neue", "Avenir Next", sans-serif;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 179, 71, 0.36), transparent 30%),
+        radial-gradient(circle at 82% 12%, rgba(92, 198, 255, 0.28), transparent 32%),
+        radial-gradient(circle at 24% 72%, rgba(255, 122, 195, 0.28), transparent 26%),
+        radial-gradient(circle at 90% 72%, rgba(102, 227, 176, 0.28), transparent 28%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
       color: var(--text);
+      position: relative;
+      overflow-x: hidden;
     }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 320px;
+      height: 320px;
+      border-radius: 40% 60% 50% 70%;
+      filter: blur(70px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      background: var(--accent-3);
+      top: -120px;
+      left: -160px;
+    }
+
+    body::after {
+      background: var(--accent);
+      bottom: -140px;
+      right: -140px;
+    }
+
     .app {
+      position: relative;
+      z-index: 1;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 32px 20px 80px;
+      padding: 36px 22px 90px;
     }
+
     header {
       display: flex;
       flex-wrap: wrap;
@@ -37,216 +82,378 @@
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 18px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 2px solid #ffd68a;
+      border-radius: 20px;
+      padding: 12px 14px;
+      box-shadow: 0 15px 40px rgba(255, 122, 195, 0.12);
+      backdrop-filter: blur(6px);
     }
+
     h1 {
       margin: 0;
-      font-size: 32px;
+      font-size: 34px;
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      color: #ff5c99;
+      text-shadow: 0 3px 0 #ffe6f4;
     }
+
     h1 span {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white;
-      font-weight: 700;
-      font-size: 20px;
-      box-shadow: 0 10px 25px rgba(92, 108, 255, 0.25);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 30% 30%, #fff6d0, #ffb347);
+      color: #3a2a00;
+      font-weight: 800;
+      font-size: 22px;
+      box-shadow: 0 10px 25px rgba(255, 179, 71, 0.35);
+      border: 2px solid #ffe6b8;
     }
+
     .meta {
       display: flex;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-      font-size: 14px;
+      font-size: 15px;
       color: var(--muted);
     }
+
     .pill {
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: rgba(92, 108, 255, 0.1);
-      color: #3041c3;
-      font-weight: 700;
+      padding: 11px 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255, 186, 92, 0.18), rgba(92, 198, 255, 0.18));
+      color: #2b243f;
+      font-weight: 800;
+      border: 2px solid #ffe0a1;
+      box-shadow: 0 8px 16px rgba(255, 179, 71, 0.16);
     }
-    .pill em { font-style: normal; color: var(--text); }
+
+    .pill em {
+      font-style: normal;
+      color: #0f0d1c;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 16px;
     }
+
     .card {
       background: var(--card);
-      border-radius: 18px;
-      padding: 20px 18px;
-      box-shadow: 0 15px 35px rgba(34, 44, 94, 0.12);
+      border-radius: 22px;
+      padding: 22px 20px;
+      box-shadow: 0 18px 40px rgba(43, 36, 63, 0.16);
       position: relative;
       overflow: hidden;
+      border: 2px solid #ffe0a1;
     }
+
     .card h2 {
-      margin: 6px 0 10px;
-      font-size: 20px;
+      margin: 6px 0 8px;
+      font-size: 22px;
+      color: #ff5c99;
+      text-shadow: 0 2px 0 #ffe6f4;
     }
+
     .card p {
       margin: 4px 0 12px;
       color: var(--muted);
     }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: -80px -120px auto auto;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(92, 198, 255, 0.35), transparent 50%);
+      transform: rotate(12deg);
+      z-index: 0;
+    }
+
+    .card>* {
+      position: relative;
+      z-index: 1;
+    }
+
     form {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
     }
+
     input[type="text"] {
       flex: 1;
-      min-width: 160px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid #e3e5f0;
-      font-size: 16px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      background: #f9f9ff;
+      min-width: 180px;
+      padding: 13px 15px;
+      border-radius: 14px;
+      border: 2px solid #ffd68a;
+      font-size: 17px;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+      background: #fffdf7;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
     }
+
     input[type="text"]:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(92, 108, 255, 0.15);
+      border-color: #ff7ac3;
+      box-shadow: 0 0 0 4px rgba(255, 122, 195, 0.22);
+      transform: translateY(-1px);
     }
+
     button {
       border: none;
       cursor: pointer;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 15px;
-      transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
-      background: linear-gradient(135deg, var(--accent), #3946d4);
-      color: white;
-      box-shadow: 0 10px 25px rgba(92, 108, 255, 0.3);
+      padding: 13px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 16px;
+      transition: transform 0.12s, box-shadow 0.2s, background 0.2s;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #2b243f;
+      box-shadow: 0 12px 26px rgba(255, 122, 195, 0.35);
+      border: 2px solid #ffb7df;
     }
+
+    button:hover {
+      transform: translateY(-1px) scale(1.01);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
     button.secondary {
-      background: #f0f2ff;
-      color: #3041c3;
-      box-shadow: none;
-      border: 1px solid #dfe3ff;
+      background: linear-gradient(135deg, #d8f3ff, #fffdf7);
+      color: #1d3045;
+      border-color: #b9e8ff;
+      box-shadow: 0 8px 20px rgba(92, 198, 255, 0.18);
     }
-    button:active { transform: translateY(1px); }
+
     .timer {
-      margin: 6px 0 12px;
-      font-weight: 700;
+      margin: 6px 0 14px;
+      font-weight: 800;
       color: var(--text);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
+
     .timer-bar {
       width: 100%;
-      height: 10px;
-      background: #eef0ff;
+      height: 12px;
+      background: #ffecc7;
       border-radius: 999px;
       overflow: hidden;
       position: relative;
+      border: 2px solid #ffcf8a;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
     }
+
     .timer-fill {
       position: absolute;
       top: 0;
       left: 0;
       height: 100%;
       width: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      background: repeating-linear-gradient(45deg, #ff7ac3, #ff7ac3 14px, #ffb347 14px, #ffb347 28px);
       transform-origin: left;
       transition: width 0.2s linear;
     }
+
     .feedback {
-      margin-top: 12px;
-      font-weight: 700;
+      margin-top: 14px;
+      font-weight: 800;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-size: 16px;
     }
-    .feedback.correct { color: var(--success); }
-    .feedback.wrong { color: var(--danger); }
+
+    .feedback.correct {
+      color: var(--success);
+    }
+
+    .feedback.wrong {
+      color: var(--danger);
+    }
+
     .word-chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #fef4eb;
+      background: #fff3fd;
       border-radius: 999px;
-      padding: 6px 10px;
-      color: #c4641f;
-      font-weight: 700;
+      padding: 7px 12px;
+      color: #b03286;
+      font-weight: 800;
       font-size: 14px;
+      border: 2px solid #ffd5f2;
+      box-shadow: 0 6px 14px rgba(255, 122, 195, 0.2);
     }
+
     .stacked {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
+
     .scoreboard-list {
       list-style: none;
       padding: 0;
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
+
     .scoreboard-item {
-      background: #f8f8ff;
-      border: 1px solid #e5e8ff;
-      border-radius: 12px;
-      padding: 10px 12px;
+      background: linear-gradient(135deg, rgba(255, 186, 92, 0.15), rgba(92, 198, 255, 0.12));
+      border: 2px solid #ffcf8a;
+      border-radius: 16px;
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      box-shadow: 0 10px 22px rgba(43, 36, 63, 0.12);
     }
-    .scoreboard-item strong { color: var(--text); }
+
+    .scoreboard-item strong {
+      color: var(--text);
+    }
+
     .badge {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: #e7eaff;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #66e3b0, #5cc6ff);
       display: grid;
       place-items: center;
       font-weight: 800;
-      color: #3041c3;
+      color: #0c1c2a;
+      border: 2px solid #b5f3da;
+      box-shadow: 0 6px 14px rgba(102, 227, 176, 0.22);
     }
-    .muted { color: var(--muted); font-size: 14px; }
-    .hidden { display: none !important; }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
     .floating {
       position: absolute;
-      opacity: 0.2;
+      opacity: 0.3;
       pointer-events: none;
-      filter: blur(0.6px);
+      filter: blur(0.3px);
+      animation: floaty 6s ease-in-out infinite;
     }
-    .float-1 { width: 120px; height: 120px; background: var(--accent-2); top: -20px; right: -30px; border-radius: 36px; transform: rotate(12deg); }
-    .float-2 { width: 90px; height: 90px; background: var(--accent); bottom: -20px; left: -16px; border-radius: 30px; transform: rotate(-8deg); }
+
+    .float-1 {
+      width: 140px;
+      height: 140px;
+      background: #ffb347;
+      top: -18px;
+      right: -24px;
+      border-radius: 32px;
+      transform: rotate(10deg);
+    }
+
+    .float-2 {
+      width: 110px;
+      height: 110px;
+      background: #5cc6ff;
+      bottom: -16px;
+      left: -10px;
+      border-radius: 30px;
+      transform: rotate(-6deg);
+      animation-delay: 1.2s;
+    }
+
+    .float-3 {
+      width: 120px;
+      height: 120px;
+      background: #ff7ac3;
+      bottom: -30px;
+      right: 16px;
+      border-radius: 38px;
+      transform: rotate(18deg);
+      animation-delay: 0.6s;
+    }
+
     .summary {
       margin-top: 12px;
       padding: 12px;
-      border: 1px dashed #dfe3ff;
-      border-radius: 12px;
-      background: #f6f7ff;
+      border: 2px dashed #ffcf8a;
+      border-radius: 14px;
+      background: #fff8ed;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      box-shadow: inset 0 3px 8px rgba(255, 186, 92, 0.14);
     }
+
+    .tip-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: #e9f9ff;
+      color: #195270;
+      font-weight: 700;
+    }
+
+    @keyframes floaty {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(6deg);
+      }
+
+      50% {
+        transform: translateY(8px) rotate(-4deg);
+      }
+    }
+
     @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="app">
     <header>
       <h1><span>🐝</span> Spelling Quest</h1>
       <div class="meta">
-        <div class="pill">Score: <em id="score">0</em> / 20</div>
-        <div class="pill">Word: <em id="word-count">0</em> / 20</div>
+        <div class="pill">Score: <em id="score">0</em> / 15</div>
+        <div class="pill">Word: <em id="word-count">0</em> / 15</div>
         <div class="pill">Time: <em id="time-left">--</em>s</div>
       </div>
     </header>
@@ -255,27 +462,31 @@
       <section class="card" id="setup-card">
         <div class="floating float-1"></div>
         <div class="floating float-2"></div>
-        <h2>Welcome, speller!</h2>
-        <p>Pick a name, hit start, listen for the word, and type it before the timer runs out. Twenty words per round.</p>
+        <h2>Ready to buzz?</h2>
+        <p>Pick a player name, press start, listen for the word, and race the rainbow timer! Fifteen words per round.
+        </p>
         <form id="setup-form">
-          <input type="text" id="player-name" placeholder="Your first name" required maxlength="20" aria-label="Player name">
-          <button type="submit">Start my game</button>
+          <input type="text" id="player-name" placeholder="Your first name" required maxlength="20"
+            aria-label="Player name">
+          <button type="submit">Start the buzz!</button>
         </form>
         <div class="summary">
-          <div><strong>How to play</strong></div>
-          <div class="muted">1) Tap the speaker if you need to hear the word again.</div>
-          <div class="muted">2) Timer is 10–20 seconds, based on the word length.</div>
-          <div class="muted">3) Finish all 20 words to save your score.</div>
+          <div class="tag">✨ Adventure tips</div>
+          <div class="muted">🐝 Tap the speaker if you need to hear the word again.</div>
+          <div class="muted">⏰ Timer is 30 to 50 seconds, based on the word length.</div>
+          <div class="muted">🏅 Finish all 15 words to save your score.</div>
         </div>
       </section>
 
       <section class="card stacked hidden" id="game-card">
         <div>
-          <h2>Round in progress</h2>
-          <p class="muted">Listen carefully, then spell. Press enter to submit.</p>
+          <h2>Buzzing round</h2>
+          <p class="muted">Listen, then type your best spelling before the timer pops!</p>
           <div class="timer">
             <span class="word-chip">⏱ <span id="timer-label">Ready</span></span>
-            <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+            <div class="timer-bar">
+              <div class="timer-fill" id="timer-fill"></div>
+            </div>
           </div>
           <div class="muted" id="hint">Press the speaker to hear your word.</div>
         </div>
@@ -283,10 +494,11 @@
         <div>
           <div class="pill" style="display:inline-flex; align-items:center; gap:6px; margin-bottom:8px;">
             <button type="button" class="secondary" id="speak-btn" aria-label="Speak word">🔊 Speak word</button>
-            <span class="muted">Word <span id="current-word-number">1</span> of 20</span>
+            <span class="muted">Word <span id="current-word-number">1</span> of 15</span>
           </div>
           <form id="answer-form">
-            <input type="text" id="answer-input" autocomplete="off" placeholder="Type the spelling here" aria-label="Your spelling">
+            <input type="text" id="answer-input" autocomplete="off" placeholder="Type the spelling here"
+              aria-label="Your spelling">
             <button type="submit">Submit</button>
           </form>
           <div class="feedback" id="feedback" aria-live="polite"></div>
@@ -294,10 +506,11 @@
       </section>
 
       <section class="card stacked hidden" id="summary-card">
-        <h2>Game finished 🎉</h2>
+        <div class="floating float-3"></div>
+        <h2>Great job, superstar! 🎉</h2>
         <p class="muted">Nice work! Check the scoreboard to see your place.</p>
         <div class="summary">
-          <div><strong>Final score</strong>: <span id="final-score">0</span> / 20</div>
+          <div><strong>Final score</strong>: <span id="final-score">0</span> / 15</div>
           <div id="correct-count" class="muted"></div>
           <div id="miss-count" class="muted"></div>
         </div>
@@ -309,8 +522,9 @@
       </section>
 
       <section class="card stacked" id="scoreboard-card">
-        <h2>Local scoreboard</h2>
-        <p class="muted">Scores save in your browser after each 20-word round.</p>
+        <div class="floating float-2"></div>
+        <h2>Hive scoreboard</h2>
+        <p class="muted">Scores stick in your browser after each 15-word round.</p>
         <ul class="scoreboard-list" id="scoreboard"></ul>
         <div class="muted" id="no-scores">No scores yet. Finish a game to save one!</div>
       </section>
@@ -318,11 +532,11 @@
   </div>
 
   <script>
-    const TOTAL_WORDS = 20;
+    const TOTAL_WORDS = 15;
     const storageKey = "spelling-quest-scores";
     const words = [
-      "garden", "puzzle", "mystery", "pillow", "rocket", "planet", "capture", "journey",
-      "dolphin", "river", "thunder", "whistle", "shadow", "canyon", "lantern", "pepper",
+      "garden", "puzzle", "mystery", "pillow", "rocket", "planet", "capture",
+      "dolphin", "river", "thunder", "whistle", "shadow", "canyon", "pepper",
       "marble", "castle", "forest", "sunrise", "parade", "feather", "velvet", "bubble",
       "courage", "giraffe", "bicycle", "alphabet", "holiday", "friend", "giggle", "basket",
       "silver", "nature", "cousin", "explore", "adventure", "cactus", "sudden", "wonder",
@@ -330,8 +544,14 @@
       "farmer", "brave", "memory", "island", "harbor", "blanket", "fortune", "lizard",
       "morning", "evening", "pocket", "lightning", "music", "treasure", "secret", "fossil",
       "lantern", "kindness", "harvest", "sparkle", "orchard", "sandwich", "cabin", "grateful",
-      "capture", "library", "science", "pioneer", "journey", "picture", "energy", "rainbow"
+      "library", "science", "pioneer", "picture", "energy", "rainbow",
+      "unicorn", "pirates", "leaning", "acrobat", "forepaw", "recipe", "mermaid", "incredible", "nervous", "raise", "attacked", "streetlights", "shouting", "dinosaur",
+      "gorgeous", "avocado", "formation", "faraway", "understand", "breakfast", "message", "elephant", "garbage", "bombarded", "leather", "peppercorn", "weather",
+      "turnout", "journey", "asleep", "brilliant", "monsoon", "valentine", "especially", "heater", "wooden",
+      "window", "chocolate", "hedgehog", "surprise", "disability", "countess", "cartwheel",
+      "zooming", "eaten", "courtyard", "curious", "vacuum", "dangerous", "February"
     ];
+    const uniqueWords = Array.from(new Set(words));
 
     const setupCard = document.getElementById("setup-card");
     const gameCard = document.getElementById("game-card");
@@ -341,6 +561,7 @@
     const reviewList = document.getElementById("review-list");
     const timerFill = document.getElementById("timer-fill");
     const timerLabel = document.getElementById("timer-label");
+    let feedbackClearTimeout = null;
 
     const scoreEl = document.getElementById("score");
     const wordCountEl = document.getElementById("word-count");
@@ -385,8 +606,25 @@
 
     const clamp = (val, min, max) => Math.min(max, Math.max(min, val));
 
+    function clearFeedbackLine() {
+      if (feedbackClearTimeout) {
+        clearTimeout(feedbackClearTimeout);
+        feedbackClearTimeout = null;
+      }
+      feedbackEl.textContent = "";
+      feedbackEl.className = "feedback";
+    }
+
+    function scheduleFeedbackClear() {
+      if (feedbackClearTimeout) clearTimeout(feedbackClearTimeout);
+      feedbackClearTimeout = setTimeout(() => {
+        clearFeedbackLine();
+      }, 5000);
+    }
+
     function nextWords() {
-      const shuffled = shuffle(words);
+      const pool = uniqueWords.length >= TOTAL_WORDS ? uniqueWords : words;
+      const shuffled = shuffle(pool);
       return shuffled.slice(0, TOTAL_WORDS);
     }
 
@@ -407,7 +645,7 @@
       timeLeftEl.textContent = "--";
       currentWordNumberEl.textContent = "1";
       feedbackEl.textContent = "";
-      feedbackEl.className = "feedback";
+      clearFeedbackLine();
       reviewList.innerHTML = "";
       reviewList.classList.add("hidden");
       summaryCard.classList.add("hidden");
@@ -423,14 +661,14 @@
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(word);
       u.lang = "en-US";
-      u.rate = 0.95;
-      u.pitch = 1.02;
+      u.rate = 0.3;
+      u.pitch = 4;
       window.speechSynthesis.speak(u);
     }
 
     function timeForWord(word) {
       const len = word.length;
-      return clamp(8 + Math.round(len * 1.2), 10, 20);
+      return clamp(20 + Math.round(len * 1.2), 30, 50);
     }
 
     function startTimer(seconds, resumeMs) {
@@ -502,6 +740,7 @@
           typed: timedOut ? "(no answer)" : guessRaw || "(no answer)"
         });
       }
+      scheduleFeedbackClear();
       scoreEl.textContent = gameState.score;
       wordCountEl.textContent = gameState.index + 1;
       timeLeftEl.textContent = "—";
@@ -602,6 +841,10 @@
       speak(gameState.currentWord);
     });
 
+    answerInput.addEventListener("input", () => {
+      clearFeedbackLine();
+    });
+
     playAgainBtn.addEventListener("click", () => {
       summaryCard.classList.add("hidden");
       setupCard.classList.remove("hidden");
@@ -626,4 +869,5 @@
     renderScores();
   </script>
 </body>
+
 </html>
