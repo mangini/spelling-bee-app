@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spelling Quest</title>
+  <style>
+    :root {
+      --bg: #f7f3ff;
+      --card: #ffffff;
+      --accent: #5c6cff;
+      --accent-2: #ff9f6e;
+      --text: #1f1f33;
+      --muted: #6a6a80;
+      --success: #1bbf72;
+      --danger: #ff4f5e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Trebuchet MS", "Gill Sans", sans-serif;
+      background: radial-gradient(circle at 15% 20%, rgba(255, 199, 135, 0.3), transparent 25%),
+                  radial-gradient(circle at 80% 0%, rgba(92, 108, 255, 0.25), transparent 35%),
+                  linear-gradient(135deg, #fdfbff 0%, #f2f5ff 100%);
+      color: var(--text);
+    }
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h1 span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      box-shadow: 0 10px 25px rgba(92, 108, 255, 0.25);
+    }
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .pill {
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(92, 108, 255, 0.1);
+      color: #3041c3;
+      font-weight: 700;
+    }
+    .pill em { font-style: normal; color: var(--text); }
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 20px 18px;
+      box-shadow: 0 15px 35px rgba(34, 44, 94, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .card h2 {
+      margin: 6px 0 10px;
+      font-size: 20px;
+    }
+    .card p {
+      margin: 4px 0 12px;
+      color: var(--muted);
+    }
+    form {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      flex: 1;
+      min-width: 160px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #e3e5f0;
+      font-size: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #f9f9ff;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(92, 108, 255, 0.15);
+    }
+    button {
+      border: none;
+      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+      background: linear-gradient(135deg, var(--accent), #3946d4);
+      color: white;
+      box-shadow: 0 10px 25px rgba(92, 108, 255, 0.3);
+    }
+    button.secondary {
+      background: #f0f2ff;
+      color: #3041c3;
+      box-shadow: none;
+      border: 1px solid #dfe3ff;
+    }
+    button:active { transform: translateY(1px); }
+    .timer {
+      margin: 6px 0 12px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timer-bar {
+      width: 100%;
+      height: 10px;
+      background: #eef0ff;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .timer-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transform-origin: left;
+      transition: width 0.2s linear;
+    }
+    .feedback {
+      margin-top: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feedback.correct { color: var(--success); }
+    .feedback.wrong { color: var(--danger); }
+    .word-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef4eb;
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: #c4641f;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .stacked {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .scoreboard-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .scoreboard-item {
+      background: #f8f8ff;
+      border: 1px solid #e5e8ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .scoreboard-item strong { color: var(--text); }
+    .badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #e7eaff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #3041c3;
+    }
+    .muted { color: var(--muted); font-size: 14px; }
+    .hidden { display: none !important; }
+    .floating {
+      position: absolute;
+      opacity: 0.2;
+      pointer-events: none;
+      filter: blur(0.6px);
+    }
+    .float-1 { width: 120px; height: 120px; background: var(--accent-2); top: -20px; right: -30px; border-radius: 36px; transform: rotate(12deg); }
+    .float-2 { width: 90px; height: 90px; background: var(--accent); bottom: -20px; left: -16px; border-radius: 30px; transform: rotate(-8deg); }
+    .summary {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px dashed #dfe3ff;
+      border-radius: 12px;
+      background: #f6f7ff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1><span>🐝</span> Spelling Quest</h1>
+      <div class="meta">
+        <div class="pill">Score: <em id="score">0</em> / 20</div>
+        <div class="pill">Word: <em id="word-count">0</em> / 20</div>
+        <div class="pill">Time: <em id="time-left">--</em>s</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card" id="setup-card">
+        <div class="floating float-1"></div>
+        <div class="floating float-2"></div>
+        <h2>Welcome, speller!</h2>
+        <p>Pick a name, hit start, listen for the word, and type it before the timer runs out. Twenty words per round.</p>
+        <form id="setup-form">
+          <input type="text" id="player-name" placeholder="Your first name" required maxlength="20" aria-label="Player name">
+          <button type="submit">Start my game</button>
+        </form>
+        <div class="summary">
+          <div><strong>How to play</strong></div>
+          <div class="muted">1) Tap the speaker if you need to hear the word again.</div>
+          <div class="muted">2) Timer is 10–20 seconds, based on the word length.</div>
+          <div class="muted">3) Finish all 20 words to save your score.</div>
+        </div>
+      </section>
+
+      <section class="card stacked hidden" id="game-card">
+        <div>
+          <h2>Round in progress</h2>
+          <p class="muted">Listen carefully, then spell. Press enter to submit.</p>
+          <div class="timer">
+            <span class="word-chip">⏱ <span id="timer-label">Ready</span></span>
+            <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+          </div>
+          <div class="muted" id="hint">Press the speaker to hear your word.</div>
+        </div>
+
+        <div>
+          <div class="pill" style="display:inline-flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <button type="button" class="secondary" id="speak-btn" aria-label="Speak word">🔊 Speak word</button>
+            <span class="muted">Word <span id="current-word-number">1</span> of 20</span>
+          </div>
+          <form id="answer-form">
+            <input type="text" id="answer-input" autocomplete="off" placeholder="Type the spelling here" aria-label="Your spelling">
+            <button type="submit">Submit</button>
+          </form>
+          <div class="feedback" id="feedback" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="card stacked hidden" id="summary-card">
+        <h2>Game finished 🎉</h2>
+        <p class="muted">Nice work! Check the scoreboard to see your place.</p>
+        <div class="summary">
+          <div><strong>Final score</strong>: <span id="final-score">0</span> / 20</div>
+          <div id="correct-count" class="muted"></div>
+          <div id="miss-count" class="muted"></div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="play-again">Play again</button>
+          <button id="review-btn" class="secondary">See missed words</button>
+        </div>
+        <div class="summary hidden" id="review-list"></div>
+      </section>
+
+      <section class="card stacked" id="scoreboard-card">
+        <h2>Local scoreboard</h2>
+        <p class="muted">Scores save in your browser after each 20-word round.</p>
+        <ul class="scoreboard-list" id="scoreboard"></ul>
+        <div class="muted" id="no-scores">No scores yet. Finish a game to save one!</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_WORDS = 20;
+    const storageKey = "spelling-quest-scores";
+    const words = [
+      "garden", "puzzle", "mystery", "pillow", "rocket", "planet", "capture", "journey",
+      "dolphin", "river", "thunder", "whistle", "shadow", "canyon", "lantern", "pepper",
+      "marble", "castle", "forest", "sunrise", "parade", "feather", "velvet", "bubble",
+      "courage", "giraffe", "bicycle", "alphabet", "holiday", "friend", "giggle", "basket",
+      "silver", "nature", "cousin", "explore", "adventure", "cactus", "sudden", "wonder",
+      "pirate", "anchor", "jungle", "flavor", "winter", "summer", "autumn", "spring",
+      "farmer", "brave", "memory", "island", "harbor", "blanket", "fortune", "lizard",
+      "morning", "evening", "pocket", "lightning", "music", "treasure", "secret", "fossil",
+      "lantern", "kindness", "harvest", "sparkle", "orchard", "sandwich", "cabin", "grateful",
+      "capture", "library", "science", "pioneer", "journey", "picture", "energy", "rainbow"
+    ];
+
+    const setupCard = document.getElementById("setup-card");
+    const gameCard = document.getElementById("game-card");
+    const summaryCard = document.getElementById("summary-card");
+    const scoreboardList = document.getElementById("scoreboard");
+    const noScoresEl = document.getElementById("no-scores");
+    const reviewList = document.getElementById("review-list");
+    const timerFill = document.getElementById("timer-fill");
+    const timerLabel = document.getElementById("timer-label");
+
+    const scoreEl = document.getElementById("score");
+    const wordCountEl = document.getElementById("word-count");
+    const timeLeftEl = document.getElementById("time-left");
+    const currentWordNumberEl = document.getElementById("current-word-number");
+    const feedbackEl = document.getElementById("feedback");
+    const hintEl = document.getElementById("hint");
+    const finalScoreEl = document.getElementById("final-score");
+    const correctCountEl = document.getElementById("correct-count");
+    const missCountEl = document.getElementById("miss-count");
+
+    const setupForm = document.getElementById("setup-form");
+    const answerForm = document.getElementById("answer-form");
+    const nameInput = document.getElementById("player-name");
+    const answerInput = document.getElementById("answer-input");
+    const speakBtn = document.getElementById("speak-btn");
+    const playAgainBtn = document.getElementById("play-again");
+    const reviewBtn = document.getElementById("review-btn");
+
+    let gameState = {
+      name: "",
+      score: 0,
+      index: 0,
+      remaining: [],
+      currentWord: "",
+      timerId: null,
+      deadline: null,
+      answered: false,
+      misses: [],
+      totalMs: 0,
+      pausedMs: 0
+    };
+
+    const shuffle = (arr) => {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    };
+
+    const clamp = (val, min, max) => Math.min(max, Math.max(min, val));
+
+    function nextWords() {
+      const shuffled = shuffle(words);
+      return shuffled.slice(0, TOTAL_WORDS);
+    }
+
+    function startGame(name) {
+      gameState = {
+        name,
+        score: 0,
+        index: 0,
+        remaining: nextWords(),
+        currentWord: "",
+        timerId: null,
+        deadline: null,
+        answered: false,
+        misses: []
+      };
+      scoreEl.textContent = "0";
+      wordCountEl.textContent = "0";
+      timeLeftEl.textContent = "--";
+      currentWordNumberEl.textContent = "1";
+      feedbackEl.textContent = "";
+      feedbackEl.className = "feedback";
+      reviewList.innerHTML = "";
+      reviewList.classList.add("hidden");
+      summaryCard.classList.add("hidden");
+      setupCard.classList.add("hidden");
+      gameCard.classList.remove("hidden");
+      answerInput.value = "";
+      answerInput.focus();
+      loadNextWord();
+    }
+
+    function speak(word) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(word);
+      u.lang = "en-US";
+      u.rate = 0.95;
+      u.pitch = 1.02;
+      window.speechSynthesis.speak(u);
+    }
+
+    function timeForWord(word) {
+      const len = word.length;
+      return clamp(8 + Math.round(len * 1.2), 10, 20);
+    }
+
+    function startTimer(seconds, resumeMs) {
+      clearTimer();
+      const totalMs = resumeMs ?? seconds * 1000;
+      const now = Date.now();
+      gameState.deadline = now + totalMs;
+      gameState.totalMs = totalMs;
+      gameState.pausedMs = 0;
+      timerFill.style.width = "100%";
+      const startingSeconds = Math.ceil(totalMs / 1000);
+      timerLabel.textContent = `${startingSeconds}s left`;
+      timeLeftEl.textContent = startingSeconds;
+      gameState.timerId = setInterval(() => {
+        const remainingMs = gameState.deadline - Date.now();
+        gameState.pausedMs = remainingMs;
+        const remaining = Math.max(0, Math.ceil(remainingMs / 1000));
+        const pct = clamp(remainingMs / (gameState.totalMs || 1), 0, 1);
+        timerFill.style.width = `${pct * 100}%`;
+        timerLabel.textContent = `${remaining}s left`;
+        timeLeftEl.textContent = remaining;
+        if (remaining <= 0) {
+          clearTimer();
+          if (!gameState.answered) handleResult("", true);
+        }
+      }, 150);
+    }
+
+    function clearTimer() {
+      if (gameState.timerId) {
+        clearInterval(gameState.timerId);
+        gameState.timerId = null;
+      }
+    }
+
+    function loadNextWord() {
+      if (gameState.index >= TOTAL_WORDS) {
+        finishGame();
+        return;
+      }
+      gameState.currentWord = gameState.remaining[gameState.index];
+      gameState.answered = false;
+      const seconds = timeForWord(gameState.currentWord);
+      wordCountEl.textContent = gameState.index + 1;
+      currentWordNumberEl.textContent = gameState.index + 1;
+      hintEl.textContent = "Press the speaker to hear your word.";
+      answerInput.value = "";
+      answerInput.focus();
+      speak(gameState.currentWord);
+      startTimer(seconds);
+    }
+
+    function handleResult(guessRaw, timedOut = false) {
+      gameState.answered = true;
+      clearTimer();
+      const guess = guessRaw.trim().toLowerCase();
+      const correctSpelling = gameState.currentWord.toLowerCase();
+      const correct = !timedOut && guess === correctSpelling;
+      if (correct) {
+        gameState.score += 1;
+        feedbackEl.textContent = "Correct! 🎯";
+        feedbackEl.className = "feedback correct";
+      } else {
+        const missReason = timedOut ? "⏳ Time's up!" : "✖️ Not quite.";
+        feedbackEl.textContent = `${missReason} It was "${gameState.currentWord}".`;
+        feedbackEl.className = "feedback wrong";
+        gameState.misses.push({
+          word: gameState.currentWord,
+          typed: timedOut ? "(no answer)" : guessRaw || "(no answer)"
+        });
+      }
+      scoreEl.textContent = gameState.score;
+      wordCountEl.textContent = gameState.index + 1;
+      timeLeftEl.textContent = "—";
+      timerLabel.textContent = "Next word loading";
+      timerFill.style.width = "0%";
+
+      setTimeout(() => {
+        gameState.index += 1;
+        loadNextWord();
+      }, 900);
+    }
+
+    function finishGame() {
+      clearTimer();
+      gameCard.classList.add("hidden");
+      summaryCard.classList.remove("hidden");
+      finalScoreEl.textContent = gameState.score;
+      correctCountEl.textContent = `Words correct: ${gameState.score}`;
+      missCountEl.textContent = `Words missed: ${TOTAL_WORDS - gameState.score}`;
+      timeLeftEl.textContent = "—";
+      wordCountEl.textContent = `${TOTAL_WORDS}`;
+      scoreEl.textContent = gameState.score;
+      saveScore({ name: gameState.name, score: gameState.score, date: new Date().toISOString() });
+      renderScores();
+    }
+
+    function saveScore(entry) {
+      const list = loadScores();
+      list.push(entry);
+      list.sort((a, b) => b.score - a.score || new Date(b.date) - new Date(a.date));
+      const trimmed = list.slice(0, 10);
+      localStorage.setItem(storageKey, JSON.stringify(trimmed));
+    }
+
+    function loadScores() {
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (!stored) return [];
+        return JSON.parse(stored);
+      } catch (e) {
+        console.warn("Could not read scores", e);
+        return [];
+      }
+    }
+
+    function renderScores() {
+      const entries = loadScores();
+      scoreboardList.innerHTML = "";
+      if (!entries.length) {
+        noScoresEl.classList.remove("hidden");
+        return;
+      }
+      noScoresEl.classList.add("hidden");
+      entries.forEach((entry, idx) => {
+        const li = document.createElement("li");
+        li.className = "scoreboard-item";
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = idx + 1;
+        const label = document.createElement("div");
+        label.innerHTML = `<strong>${entry.name || "Player"}</strong><div class="muted">${new Date(entry.date).toLocaleDateString()}</div>`;
+        const score = document.createElement("div");
+        score.innerHTML = `<strong>${entry.score}</strong> / ${TOTAL_WORDS}`;
+        li.appendChild(badge);
+        li.appendChild(label);
+        li.appendChild(score);
+        scoreboardList.appendChild(li);
+      });
+    }
+
+    function showReview() {
+      if (!gameState.misses.length) {
+        reviewList.innerHTML = "<strong>Perfect round!</strong>";
+      } else {
+        reviewList.innerHTML = gameState.misses.map((m, idx) =>
+          `<div>${idx + 1}. <strong>${m.word}</strong> — you typed: <em>${m.typed}</em></div>`
+        ).join("");
+      }
+      reviewList.classList.remove("hidden");
+    }
+
+    setupForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = nameInput.value.trim() || "Player";
+      startGame(name);
+    });
+
+    answerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (gameState.answered) return;
+      const guess = answerInput.value;
+      handleResult(guess, false);
+    });
+
+    speakBtn.addEventListener("click", () => {
+      if (!gameState.currentWord) return;
+      hintEl.textContent = "Listen closely…";
+      speak(gameState.currentWord);
+    });
+
+    playAgainBtn.addEventListener("click", () => {
+      summaryCard.classList.add("hidden");
+      setupCard.classList.remove("hidden");
+      nameInput.focus();
+    });
+
+    reviewBtn.addEventListener("click", () => showReview());
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && gameState.timerId) {
+        const remainingMs = Math.max(0, gameState.deadline - Date.now());
+        clearTimer();
+        gameState.pausedMs = remainingMs;
+        timerLabel.textContent = "Timer paused";
+        hintEl.textContent = "We paused your timer while you were away.";
+      } else if (!document.hidden && gameState.currentWord && !gameState.answered && gameState.pausedMs > 0) {
+        startTimer(timeForWord(gameState.currentWord), gameState.pausedMs);
+        hintEl.textContent = "Timer resumed. Keep spelling!";
+      }
+    });
+
+    renderScores();
+  </script>
+</body>
+</html>
