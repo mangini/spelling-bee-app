@@ -434,6 +434,8 @@
         let timerSeconds = 30;
         let isAnswerShown = false;
 
+        let interruptSpokenResponse = false;
+
         // Load words from JSON file
         async function loadWords() {
             try {
@@ -477,15 +479,15 @@
                 const alreadyAsked = userProgress.wordsAsked.includes(word);
                 const previouslyMisspelled = userProgress.misspelled.includes(word);
 
-                // Base weight is difficulty (1-5)
-                let weight = difficulty;
+                // Base weight is difficulty (1-5) - easier words are more likely to be selected
+                let weight = 5 - difficulty;
 
-                // If previously misspelled, increase weight by 2.5x
+                // If previously misspelled, increase weight by 2.5x - misspelled words are more likely to be selected
                 if (previouslyMisspelled) {
                     weight *= 2.5;
                 }
 
-                // If already asked in this session, reduce weight to 0.1x
+                // If already asked in this session, reduce weight to 0.1x - already asked words are less likely to be selected
                 if (alreadyAsked) {
                     weight *= 0.1;
                 }
@@ -524,8 +526,12 @@
                 // Spell letter by letter with pauses
                 const letters = word.split('');
                 let delay = 0;
+                interruptSpokenResponse = false;
                 letters.forEach((letter, index) => {
                     setTimeout(() => {
+                        if (interruptSpokenResponse) {
+                            return;
+                        }
                         const utterance = new SpeechSynthesisUtterance(letter);
                         utterance.lang = 'en-US';
                         utterance.rate = 0.5;
@@ -606,6 +612,7 @@
 
         // Mark word as correct
         function markCorrect() {
+            interruptSpokenResponse = true;
             userProgress.correct++;
             userProgress.wordsAsked.push(currentWord);
             saveUserProgress();
@@ -615,6 +622,7 @@
 
         // Mark word as incorrect
         function markIncorrect() {
+            interruptSpokenResponse = true;
             userProgress.incorrect++;
             userProgress.wordsAsked.push(currentWord);
             if (!userProgress.misspelled.includes(currentWord)) {
