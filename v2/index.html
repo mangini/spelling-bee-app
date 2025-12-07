@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Bee Training</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@400;700&display=swap');
+
+        :root {
+            --primary: #FF6B9D;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --success: #95E1D3;
+            --warning: #FFA07A;
+            --bg-light: #FFF8F0;
+            --bg-card: #FFFFFF;
+            --text: #2C3E50;
+            --text-light: #7F8C8D;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-screen,
+        .game-screen {
+            background: var(--bg-card);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3em;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0px var(--accent);
+        }
+
+        h2 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2em;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .welcome-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        input[type="text"] {
+            padding: 15px 20px;
+            font-size: 1.2em;
+            border: 3px solid var(--primary);
+            border-radius: 15px;
+            font-family: 'Comic Neue', cursive;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.2);
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-family: 'Fredoka One', cursive;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+        }
+
+        button.success {
+            background: linear-gradient(135deg, var(--success), var(--secondary));
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+        }
+
+        .dashboard {
+            background: var(--bg-light);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 3px solid var(--accent);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px var(--shadow);
+            border: 2px solid var(--accent);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 1em;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .misspelled-list {
+            margin-top: 20px;
+        }
+
+        .misspelled-list h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .word-tag {
+            display: inline-block;
+            background: var(--warning);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: 700;
+        }
+
+        .game-area {
+            background: var(--bg-light);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 3px solid var(--secondary);
+        }
+
+        .word-display {
+            font-size: 4em;
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary);
+            margin: 30px 0;
+            text-shadow: 3px 3px 0px var(--accent);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-display {
+            font-size: 3em;
+            font-family: 'Fredoka One', cursive;
+            color: var(--secondary);
+            margin: 20px 0;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 3px solid var(--secondary);
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            transition: width 0.1s linear;
+            width: 100%;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .feedback-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            border: 3px solid var(--accent);
+        }
+
+        .correct-spelling {
+            font-size: 3em;
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary);
+            margin: 20px 0;
+            text-shadow: 2px 2px 0px var(--accent);
+        }
+
+        .letter-by-letter {
+            font-size: 2em;
+            font-family: 'Comic Neue', cursive;
+            color: var(--text);
+            margin: 20px 0;
+            min-height: 50px;
+        }
+
+        .letter {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 3px;
+            background: var(--accent);
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .user-info strong {
+            color: var(--accent);
+        }
+
+        .user-info #currentUserName {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px var(--accent);
+            text-align: center;
+            display: inline;
+            width: 100%;
+            text-align: center;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .bounce {
+            animation: bounce 0.5s;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 0.5s;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .word-display {
+                font-size: 2.5em;
+            }
+
+            .correct-spelling {
+                font-size: 2em;
+            }
+
+            .welcome-screen,
+            .game-screen {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1>🐝 Spelling Bee Training 🐝</h1>
+            <p style="text-align: center; font-size: 1.2em; margin-bottom: 30px; color: var(--text-light);">
+                Get ready to become a spelling champion!
+            </p>
+            <form class="welcome-form" id="welcomeForm">
+                <input type="text" id="userNameInput" placeholder="Enter your name" required autofocus>
+                <button type="submit">Start Training!</button>
+            </form>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen hidden" id="gameScreen">
+            <div class="user-info">
+                <span id="currentUserName"></span>
+                <button onclick="showWelcomeScreen()"
+                    style="padding: 8px 15px; font-size: 0.9em; margin-left: 10px;">Switch User</button>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="dashboard">
+                <h2>📊 Your Progress</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="wordsAsked">0</div>
+                        <div class="stat-label">Words Asked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="wordsCorrect">0</div>
+                        <div class="stat-label">Correct ✅</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="wordsIncorrect">0</div>
+                        <div class="stat-label">Incorrect ❌</div>
+                    </div>
+                </div>
+                <div class="misspelled-list">
+                    <h3>Words to Practice:</h3>
+                    <div id="misspelledWords">
+                        <p style="color: var(--text-light);">No misspelled words yet. Keep it up! 🎉</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Area -->
+            <div class="game-area">
+                <h2>🎯 Current Word</h2>
+                <div class="word-display" id="wordDisplay">Ready to start!</div>
+                <div class="timer-display" id="timerDisplay">30</div>
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timerFill"></div>
+                </div>
+                <div class="button-group">
+                    <button id="speakBtn" onclick="speakCurrentWord()">🔊 Hear Word Again</button>
+                    <button id="doneBtn" onclick="showAnswer()" class="secondary">Done Writing ✏️</button>
+                </div>
+            </div>
+
+            <!-- Feedback Area -->
+            <div class="feedback-area hidden" id="feedbackArea">
+                <h2>📝 Check Your Spelling</h2>
+                <div class="correct-spelling" id="correctSpelling"></div>
+                <div class="letter-by-letter" id="letterByLetter"></div>
+                <p style="margin: 20px 0; font-size: 1.2em;">Did you spell it correctly?</p>
+                <div class="button-group">
+                    <button class="success" onclick="markCorrect()">✅ Yes, I got it right!</button>
+                    <button class="danger" onclick="markIncorrect()">❌ No, I made a mistake</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let wordsData = {};
+        let currentUser = '';
+        let userProgress = {
+            wordsAsked: [],
+            correct: 0,
+            incorrect: 0,
+            misspelled: [],
+            lastSession: new Date().toISOString()
+        };
+        let currentWord = '';
+        let timerInterval = null;
+        let timerSeconds = 30;
+        let isAnswerShown = false;
+
+        // Load words from JSON file
+        async function loadWords() {
+            try {
+                const response = await fetch('words.json');
+                wordsData = await response.json();
+            } catch (error) {
+                console.error('Error loading words:', error);
+                alert('Error loading words. Please make sure words.json is available.');
+            }
+        }
+
+        // Load user progress from localStorage
+        function loadUserProgress(username) {
+            const key = `spelling-bee-${username}`;
+            const stored = localStorage.getItem(key);
+            if (stored) {
+                userProgress = JSON.parse(stored);
+            } else {
+                userProgress = {
+                    wordsAsked: [],
+                    correct: 0,
+                    incorrect: 0,
+                    misspelled: [],
+                    lastSession: new Date().toISOString()
+                };
+            }
+        }
+
+        // Save user progress to localStorage
+        function saveUserProgress() {
+            const key = `spelling-bee-${currentUser}`;
+            userProgress.lastSession = new Date().toISOString();
+            localStorage.setItem(key, JSON.stringify(userProgress));
+        }
+
+        // Select next word using probabilistic algorithm
+        function selectNextWord() {
+            const words = Object.keys(wordsData);
+            const weights = words.map(word => {
+                const difficulty = wordsData[word];
+                const alreadyAsked = userProgress.wordsAsked.includes(word);
+                const previouslyMisspelled = userProgress.misspelled.includes(word);
+
+                // Base weight is difficulty (1-5)
+                let weight = difficulty;
+
+                // If previously misspelled, increase weight by 2.5x
+                if (previouslyMisspelled) {
+                    weight *= 2.5;
+                }
+
+                // If already asked in this session, reduce weight to 0.1x
+                if (alreadyAsked) {
+                    weight *= 0.1;
+                }
+
+                return { word, weight };
+            });
+
+            // Calculate total weight
+            const totalWeight = weights.reduce((sum, item) => sum + item.weight, 0);
+
+            // Select random value
+            let random = Math.random() * totalWeight;
+
+            // Find the word corresponding to this random value
+            for (const item of weights) {
+                random -= item.weight;
+                if (random <= 0) {
+                    return item.word;
+                }
+            }
+
+            // Fallback to first word
+            return weights[0].word;
+        }
+
+        // Speak word using Web Speech API
+        function speakWord(word, letterByLetter = false) {
+            if (!window.speechSynthesis) {
+                console.warn('Speech synthesis not supported');
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+
+            if (letterByLetter) {
+                // Spell letter by letter with pauses
+                const letters = word.split('');
+                let delay = 0;
+                letters.forEach((letter, index) => {
+                    setTimeout(() => {
+                        const utterance = new SpeechSynthesisUtterance(letter);
+                        utterance.lang = 'en-US';
+                        utterance.rate = 0.5;
+                        window.speechSynthesis.speak(utterance);
+
+                        // Update display
+                        const letterDisplay = document.getElementById('letterByLetter');
+                        const currentLetters = word.substring(0, index + 1);
+                        letterDisplay.innerHTML = currentLetters.split('').map((l, i) =>
+                            `<span class="letter">${l}</span>`
+                        ).join('');
+                    }, delay);
+                    delay += 600; // 600ms between letters
+                });
+            } else {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.7;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Start timer
+        function startTimer() {
+            timerSeconds = 30;
+            isAnswerShown = false;
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerFill = document.getElementById('timerFill');
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                timerDisplay.textContent = timerSeconds;
+                timerFill.style.width = `${(timerSeconds / 30) * 100}%`;
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    if (!isAnswerShown) {
+                        showAnswer();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Show answer and feedback
+        function showAnswer() {
+            isAnswerShown = true;
+            clearInterval(timerInterval);
+
+            const wordDisplay = document.getElementById('wordDisplay');
+            const feedbackArea = document.getElementById('feedbackArea');
+            const correctSpelling = document.getElementById('correctSpelling');
+            const letterByLetter = document.getElementById('letterByLetter');
+
+            // Show correct spelling
+            correctSpelling.textContent = currentWord;
+            wordDisplay.textContent = currentWord;
+            wordDisplay.classList.add('bounce');
+
+            // Show feedback area
+            feedbackArea.classList.remove('hidden');
+
+            // Speak word again
+            setTimeout(() => {
+                speakWord(currentWord);
+            }, 500);
+
+            // Spell letter by letter after a delay
+            setTimeout(() => {
+                letterByLetter.innerHTML = '';
+                speakWord(currentWord, true);
+            }, 2000);
+        }
+
+        // Mark word as correct
+        function markCorrect() {
+            userProgress.correct++;
+            userProgress.wordsAsked.push(currentWord);
+            saveUserProgress();
+            updateDashboard();
+            nextWord();
+        }
+
+        // Mark word as incorrect
+        function markIncorrect() {
+            userProgress.incorrect++;
+            userProgress.wordsAsked.push(currentWord);
+            if (!userProgress.misspelled.includes(currentWord)) {
+                userProgress.misspelled.push(currentWord);
+            }
+            saveUserProgress();
+            updateDashboard();
+            nextWord();
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            document.getElementById('wordsAsked').textContent = userProgress.wordsAsked.length;
+            document.getElementById('wordsCorrect').textContent = userProgress.correct;
+            document.getElementById('wordsIncorrect').textContent = userProgress.incorrect;
+
+            const misspelledDiv = document.getElementById('misspelledWords');
+            if (userProgress.misspelled.length === 0) {
+                misspelledDiv.innerHTML = '<p style="color: var(--text-light);">No misspelled words yet. Keep it up! 🎉</p>';
+            } else {
+                misspelledDiv.innerHTML = userProgress.misspelled.map(word =>
+                    `<span class="word-tag">${word}</span>`
+                ).join('');
+            }
+        }
+
+        // Load next word
+        function nextWord() {
+            currentWord = selectNextWord();
+            const wordDisplay = document.getElementById('wordDisplay');
+            const feedbackArea = document.getElementById('feedbackArea');
+            const letterByLetter = document.getElementById('letterByLetter');
+            const correctSpelling = document.getElementById('correctSpelling');
+
+            // Hide feedback area
+            feedbackArea.classList.add('hidden');
+
+            // Clear previous word displays
+            letterByLetter.innerHTML = '';
+            correctSpelling.textContent = '';
+
+            // Show word placeholder
+            wordDisplay.textContent = 'Listen carefully...';
+            wordDisplay.classList.remove('bounce');
+
+            // Speak the word
+            setTimeout(() => {
+                speakWord(currentWord);
+            }, 300);
+
+            // Start timer
+            startTimer();
+        }
+
+        // Speak current word again
+        function speakCurrentWord() {
+            if (currentWord) {
+                speakWord(currentWord);
+            }
+        }
+
+        // Show welcome screen
+        function showWelcomeScreen() {
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('userNameInput').focus();
+        }
+
+        // Initialize app
+        async function init() {
+            await loadWords();
+
+            document.getElementById('welcomeForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('userNameInput').value.trim();
+                if (username) {
+                    currentUser = username;
+                    loadUserProgress(username);
+                    document.getElementById('welcomeScreen').classList.add('hidden');
+                    document.getElementById('gameScreen').classList.remove('hidden');
+                    // Set username after game screen is visible
+                    const userNameElement = document.getElementById('currentUserName');
+                    if (userNameElement) {
+                        userNameElement.textContent = username;
+                    }
+                    updateDashboard();
+                    nextWord();
+                }
+            });
+        }
+
+        // Start app when page loads
+        init();
+    </script>
+</body>
+
+</html>
